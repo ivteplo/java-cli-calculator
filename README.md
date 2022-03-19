@@ -13,4 +13,5 @@ Calculator in your terminal, written in Java.
 - [ ] Add support for parentheses
 - [ ] Add power operator (`**` or `^`)
 - [ ] Add some often-used mathematical functions
+- [ ] Add support for floating-point numbers
 
