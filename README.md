@@ -9,7 +9,7 @@ Calculator in your terminal, written in Java.
 - [x] Has unary expressions
 - [x] Has support for parentheses
 - [x] Has exponentiation operator (`^`)
-- [x] Add support for floating-point numbers
+- [x] Has support for floating-point numbers
 
 ## Todo
 
