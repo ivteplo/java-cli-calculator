@@ -27,6 +27,31 @@ public class AST {
         }
     }
 
+    public static class UnaryExpression extends Node {
+        public Operator operator;
+        public Node argument;
+
+        public enum Operator {
+            PLUS,
+            MINUS
+        }
+
+        public UnaryExpression(Operator operator, Node argument, int index) {
+            super(index);
+            this.operator = operator;
+            this.argument = argument;
+        }
+
+        public int evaluate(String sourceInput) {
+            int argument = this.argument.evaluate(sourceInput);
+
+            return switch (operator) {
+                case PLUS -> +argument;
+                case MINUS -> -argument;
+            };
+        }
+    }
+
     public static class BinaryExpression extends Node {
         public Node left;
         public Node right;

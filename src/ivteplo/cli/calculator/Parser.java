@@ -16,17 +16,27 @@ public class Parser {
     }
 
     public Node parse() {
+        return parse(true);
+    }
+
+    public Node parse(boolean callPostParse) {
+        Node result;
+        Token token = getCurrentToken();
+
         if (peekToken("Number")) {
-            return postParse(parseNumber());
+            result = parseNumber();
+        } else if (peekToken("Operator") && (token.value.equals("+") || token.value.equals("-"))) {
+            result = parseUnaryExpression();
+        } else {
+            throw new CalculationError("Unexpected token: " + token.value, input, token.index);
         }
 
-        Token token = getCurrentToken();
-        throw new CalculationError("Unexpected token: " + token.value, input, token.index);
+        return callPostParse ? postParse(result) : result;
     }
 
     private Node postParse(AST.Node node) {
         if (peekToken("Operator")) {
-            return parseBinaryExpression(node);
+            return postParse(parseBinaryExpression(node));
         }
 
         return node;
@@ -35,6 +45,21 @@ public class Parser {
     private AST.Number parseNumber() {
         Token numberToken = eatToken("Number");
         return new AST.Number(Integer.parseInt(numberToken.value), numberToken.index);
+    }
+
+    private UnaryExpression parseUnaryExpression() {
+        Token operatorToken = eatToken("Operator");
+        UnaryExpression.Operator operator = switch (operatorToken.value) {
+            case "+" -> UnaryExpression.Operator.PLUS;
+            case "-" -> UnaryExpression.Operator.MINUS;
+            default -> {
+                String errorMessage = "Unknown operator: " + operatorToken.value;
+                throw new CalculationError(errorMessage, input, operatorToken.index);
+            }
+        };
+
+        Node argument = parse(false);
+        return new UnaryExpression(operator, argument, operatorToken.index);
     }
 
     private Node parseBinaryExpression(Node left) {
@@ -62,7 +87,7 @@ public class Parser {
             }
         }
 
-        return postParse(new BinaryExpression(operator, left, right, left.index));
+        return new BinaryExpression(operator, left, right, left.index);
     }
 
     private Token getCurrentToken() {
