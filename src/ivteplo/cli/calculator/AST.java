@@ -1,6 +1,8 @@
 // Copyright (c) 2022 Ivan Teplov
 package ivteplo.cli.calculator;
 
+import ivteplo.cli.calculator.utils.BigNumber;
+
 public class AST {
     public static class Node {
         public int index;
@@ -9,20 +11,20 @@ public class AST {
             this.index = index;
         }
 
-        public int evaluate(String sourceInput) {
+        public BigNumber evaluate(String sourceInput) {
             throw new Error("Don't know how to evaluate");
         }
     }
 
     public static class Number extends Node {
-        public int value;
+        public BigNumber value;
 
-        public Number(int value, int index) {
+        public Number(BigNumber value, int index) {
             super(index);
             this.value = value;
         }
 
-        public int evaluate(String sourceInput) {
+        public BigNumber evaluate(String sourceInput) {
             return this.value;
         }
     }
@@ -42,12 +44,12 @@ public class AST {
             this.argument = argument;
         }
 
-        public int evaluate(String sourceInput) {
-            int argument = this.argument.evaluate(sourceInput);
+        public BigNumber evaluate(String sourceInput) {
+            BigNumber argument = this.argument.evaluate(sourceInput);
 
             return switch (operator) {
-                case PLUS -> +argument;
-                case MINUS -> -argument;
+                case PLUS -> argument;
+                case MINUS -> argument.multiply(new BigNumber(-1));
             };
         }
     }
@@ -60,7 +62,7 @@ public class AST {
             this.value = value;
         }
 
-        public int evaluate(String sourceInput) {
+        public BigNumber evaluate(String sourceInput) {
             return value.evaluate(sourceInput);
         }
     }
@@ -93,25 +95,25 @@ public class AST {
             this.operator = operator;
         }
 
-        public int evaluate(String sourceInput) {
-            int left = this.left.evaluate(sourceInput);
-            int right = this.right.evaluate(sourceInput);
+        public BigNumber evaluate(String sourceInput) {
+            BigNumber left = this.left.evaluate(sourceInput);
+            BigNumber right = this.right.evaluate(sourceInput);
 
             return switch (operator) {
-                case PLUS -> left + right;
-                case MINUS -> left - right;
-                case TIMES -> left * right;
+                case PLUS -> left.add(right);
+                case MINUS -> left.substract(right);
+                case TIMES -> left.multiply(right);
                 case DIVIDED_BY -> divide(left, right, sourceInput);
-                case EXPONENTIATION -> (int) Math.pow(left, right);
+                case EXPONENTIATION -> left.power(right);
             };
         }
 
-        private int divide(int left, int right, String sourceInput) {
-            if (right == 0) {
+        private BigNumber divide(BigNumber left, BigNumber right, String sourceInput) {
+            if (right.toDouble() == 0.0d) {
                 throw new CalculationError("Division by zero", sourceInput, this.left.index);
             }
 
-            return left / right;
+            return left.divide(right);
         }
     }
 }

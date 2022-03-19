@@ -2,9 +2,10 @@
 package ivteplo.cli.calculator;
 
 import ivteplo.cli.calculator.AST.Node;
+import ivteplo.cli.calculator.utils.BigNumber;
 
 public class Calculator {
-    public int evaluate(String input) {
+    public BigNumber evaluate(String input) {
         Node node = new Parser(input).parse();
         return node.evaluate(input);
     }

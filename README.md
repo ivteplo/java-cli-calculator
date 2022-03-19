@@ -9,9 +9,9 @@ Calculator in your terminal, written in Java.
 - [x] Has unary expressions
 - [x] Has support for parentheses
 - [x] Has exponentiation operator (`^`)
+- [x] Add support for floating-point numbers
 
 ## Todo
 
 - [ ] Add some often-used mathematical functions
-- [ ] Add support for floating-point numbers
 - [ ] Maybe consider adding support for big numbers

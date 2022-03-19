@@ -24,10 +24,17 @@ public class Lexer {
 
         if (Character.isDigit(currentChar)) {
             StringBuilder value = new StringBuilder();
+            boolean hasDot = false;
 
             while (!reachedEnd() && Character.isDigit(currentChar = input.charAt(index))) {
                 value.append(currentChar);
                 index += 1;
+
+                if (!hasDot && !reachedEnd() && input.charAt(index) == '.') {
+                    index += 1;
+                    hasDot = true;
+                    value.append('.');
+                }
             }
 
             return new Token("Number", value.toString(), start);

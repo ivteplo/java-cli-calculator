@@ -2,6 +2,7 @@
 package ivteplo.cli.calculator;
 
 import ivteplo.cli.calculator.AST.*;
+import ivteplo.cli.calculator.utils.BigNumber;
 
 import static ivteplo.cli.calculator.AST.BinaryExpression.precedenceOf;
 
@@ -46,7 +47,7 @@ public class Parser {
 
     private AST.Number parseNumber() {
         Token numberToken = eatToken("Number");
-        return new AST.Number(Integer.parseInt(numberToken.value), numberToken.index);
+        return new AST.Number(new BigNumber(numberToken.value), numberToken.index);
     }
 
     private UnaryExpression parseUnaryExpression() {

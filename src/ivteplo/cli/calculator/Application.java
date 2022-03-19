@@ -1,6 +1,8 @@
 // Copyright (c) 2022 Ivan Teplov
 package ivteplo.cli.calculator;
 
+import ivteplo.cli.calculator.utils.BigNumber;
+
 import java.util.Scanner;
 
 public class Application {
@@ -12,13 +14,16 @@ public class Application {
                 evaluateInput();
             } catch (CalculationError error) {
                 System.out.println(error.getMessage());
+            } catch (NumberFormatException error) {
+                System.out.println(error);
+                System.out.println("Maybe you've entered a too big number");
             }
         }
     }
 
     private static void evaluateInput() {
-        int result = calculator.evaluate(readLine());
-        System.out.println(result);
+        BigNumber result = calculator.evaluate(readLine());
+        System.out.println(result.toString());
     }
 
     private static String readLine() {
