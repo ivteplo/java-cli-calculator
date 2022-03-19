@@ -3,7 +3,13 @@ package ivteplo.cli.calculator;
 
 public class AST {
     public static class Node {
-        public int evaluate() {
+        public int index;
+
+        public Node(int index) {
+            this.index = index;
+        }
+
+        public int evaluate(String sourceInput) {
             throw new Error("Don't know how to evaluate");
         }
     }
@@ -11,11 +17,12 @@ public class AST {
     public static class Number extends Node {
         public int value;
 
-        public Number(int value) {
+        public Number(int value, int index) {
+            super(index);
             this.value = value;
         }
 
-        public int evaluate() {
+        public int evaluate(String sourceInput) {
             return this.value;
         }
     }
@@ -39,27 +46,28 @@ public class AST {
             };
         }
 
-        public BinaryExpression(Operator operator, Node left, Node right) {
+        public BinaryExpression(Operator operator, Node left, Node right, int index) {
+            super(index);
             this.left = left;
             this.right = right;
             this.operator = operator;
         }
 
-        public int evaluate() {
-            int left = this.left.evaluate();
-            int right = this.right.evaluate();
+        public int evaluate(String sourceInput) {
+            int left = this.left.evaluate(sourceInput);
+            int right = this.right.evaluate(sourceInput);
 
             return switch (operator) {
                 case PLUS -> left + right;
                 case MINUS -> left - right;
                 case TIMES -> left * right;
-                case DIVIDED_BY -> divide(left, right);
+                case DIVIDED_BY -> divide(left, right, sourceInput);
             };
         }
 
-        private int divide(int left, int right) {
+        private int divide(int left, int right, String sourceInput) {
             if (right == 0) {
-                throw new Error("Division by zero");
+                throw new CalculationError("Division by zero", sourceInput, this.left.index);
             }
 
             return left / right;

@@ -38,7 +38,7 @@ public class Lexer {
                 index += 1;
                 return new Token("Operator", currentChar + "", start);
             }
-            default -> throw new Error("Unexpected character at position 1:" + (index + 1));
+            default -> throw new CalculationError("Unexpected character: " + currentChar, input, index);
         }
     }
 }

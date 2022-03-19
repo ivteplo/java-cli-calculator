@@ -10,9 +10,8 @@ public class Application {
         while (true) {
             try {
                 evaluateInput();
-            } catch (Error error) {
+            } catch (CalculationError error) {
                 System.out.println(error.getMessage());
-                break;
             }
         }
     }

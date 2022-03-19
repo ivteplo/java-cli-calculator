@@ -2,13 +2,16 @@
 package ivteplo.cli.calculator;
 
 import ivteplo.cli.calculator.AST.*;
+
 import static ivteplo.cli.calculator.AST.BinaryExpression.precedenceOf;
 
 public class Parser {
     private final Lexer lexer;
+    private final String input;
     private Token lastPeekedToken;
 
     public Parser(String input) {
+        this.input = input;
         lexer = new Lexer(input);
     }
 
@@ -17,7 +20,8 @@ public class Parser {
             return postParse(parseNumber());
         }
 
-        throw new Error("Unexpected token: " + getCurrentToken().value);
+        Token token = getCurrentToken();
+        throw new CalculationError("Unexpected token: " + token.value, input, token.index);
     }
 
     private Node postParse(AST.Node node) {
@@ -30,7 +34,7 @@ public class Parser {
 
     private AST.Number parseNumber() {
         Token numberToken = eatToken("Number");
-        return new AST.Number(Integer.parseInt(numberToken.value));
+        return new AST.Number(Integer.parseInt(numberToken.value), numberToken.index);
     }
 
     private Node parseBinaryExpression(Node left) {
@@ -41,7 +45,10 @@ public class Parser {
             case "-" -> BinaryExpression.Operator.MINUS;
             case "*" -> BinaryExpression.Operator.TIMES;
             case "/" -> BinaryExpression.Operator.DIVIDED_BY;
-            default -> throw new Error("Unknown operator: " + operatorToken.value);
+            default -> {
+                String errorMessage = "Unknown operator: " + operatorToken.value;
+                throw new CalculationError(errorMessage, input, operatorToken.index);
+            }
         };
 
         if (right instanceof BinaryExpression) {
@@ -49,13 +56,13 @@ public class Parser {
             int leftPrecedence = precedenceOf(operator);
 
             if (rightPrecedence < leftPrecedence) {
-                left = new BinaryExpression(operator, left, ((BinaryExpression) right).left);
+                left = new BinaryExpression(operator, left, ((BinaryExpression) right).left, left.index);
                 operator = ((BinaryExpression) right).operator;
                 right = ((BinaryExpression) right).right;
             }
         }
 
-        return postParse(new BinaryExpression(operator, left, right));
+        return postParse(new BinaryExpression(operator, left, right, left.index));
     }
 
     private Token getCurrentToken() {
@@ -74,7 +81,8 @@ public class Parser {
         Token token = getCurrentToken();
 
         if (!token.type.equals(type)) {
-            throw new Error("Expected token of type " + type + ", but got " + token.type);
+            String message = "Expected token of type " + type + ", but got " + token.type;
+            throw new CalculationError(message, input, token.index);
         }
 
         lastPeekedToken = null;

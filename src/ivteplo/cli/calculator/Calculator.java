@@ -6,6 +6,6 @@ import ivteplo.cli.calculator.AST.Node;
 public class Calculator {
     public int evaluate(String input) {
         Node node = new Parser(input).parse();
-        return node.evaluate();
+        return node.evaluate(input);
     }
 }
