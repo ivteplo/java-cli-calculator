@@ -38,6 +38,11 @@ public class Lexer {
                 index += 1;
                 return new Token("Operator", currentChar + "", start);
             }
+            case '(', ')' -> {
+                index += 1;
+                String type = (currentChar == '(' ? "Left" : "Right") + "Parenthesis";
+                return new Token(type, currentChar + "", start);
+            }
             default -> throw new CalculationError("Unexpected character: " + currentChar, input, index);
         }
     }

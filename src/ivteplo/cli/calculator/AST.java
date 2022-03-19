@@ -52,6 +52,19 @@ public class AST {
         }
     }
 
+    public static class WrappedExpression extends Node {
+        public Node value;
+
+        public WrappedExpression(Node value, int index) {
+            super(index);
+            this.value = value;
+        }
+
+        public int evaluate(String sourceInput) {
+            return value.evaluate(sourceInput);
+        }
+    }
+
     public static class BinaryExpression extends Node {
         public Node left;
         public Node right;

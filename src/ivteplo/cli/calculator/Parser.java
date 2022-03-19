@@ -27,6 +27,8 @@ public class Parser {
             result = parseNumber();
         } else if (peekToken("Operator") && (token.value.equals("+") || token.value.equals("-"))) {
             result = parseUnaryExpression();
+        } else if (peekToken("LeftParenthesis")) {
+            result = parseWrappedExpression();
         } else {
             throw new CalculationError("Unexpected token: " + token.value, input, token.index);
         }
@@ -60,6 +62,13 @@ public class Parser {
 
         Node argument = parse(false);
         return new UnaryExpression(operator, argument, operatorToken.index);
+    }
+
+    private WrappedExpression parseWrappedExpression() {
+        Token start = eatToken("LeftParenthesis");
+        Node value = parse();
+        eatToken("RightParenthesis");
+        return new WrappedExpression(value, start.index);
     }
 
     private Node parseBinaryExpression(Node left) {
