@@ -79,6 +79,7 @@ public class Parser {
             case "-" -> BinaryExpression.Operator.MINUS;
             case "*" -> BinaryExpression.Operator.TIMES;
             case "/" -> BinaryExpression.Operator.DIVIDED_BY;
+            case "^" -> BinaryExpression.Operator.EXPONENTIATION;
             default -> {
                 String errorMessage = "Unknown operator: " + operatorToken.value;
                 throw new CalculationError(errorMessage, input, operatorToken.index);

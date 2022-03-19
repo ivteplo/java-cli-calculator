@@ -74,13 +74,15 @@ public class AST {
             PLUS,
             MINUS,
             TIMES,
-            DIVIDED_BY
+            DIVIDED_BY,
+            EXPONENTIATION
         }
 
         public static int precedenceOf(Operator operator) {
             return switch (operator) {
                 case PLUS, MINUS -> 1;
                 case TIMES, DIVIDED_BY -> 2;
+                case EXPONENTIATION -> 3;
             };
         }
 
@@ -100,6 +102,7 @@ public class AST {
                 case MINUS -> left - right;
                 case TIMES -> left * right;
                 case DIVIDED_BY -> divide(left, right, sourceInput);
+                case EXPONENTIATION -> (int) Math.pow(left, right);
             };
         }
 

@@ -34,7 +34,7 @@ public class Lexer {
         }
 
         switch (currentChar) {
-            case '+', '-', '*', '/' -> {
+            case '+', '-', '*', '/', '^' -> {
                 index += 1;
                 return new Token("Operator", currentChar + "", start);
             }
