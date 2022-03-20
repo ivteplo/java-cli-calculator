@@ -2,7 +2,7 @@
 package ivteplo.cli.calculator;
 
 import ivteplo.cli.calculator.AST.*;
-import ivteplo.cli.calculator.utils.BigNumber;
+import java.math.BigDecimal;
 
 import static ivteplo.cli.calculator.AST.BinaryExpression.precedenceOf;
 
@@ -47,7 +47,12 @@ public class Parser {
 
     private AST.Number parseNumber() {
         Token numberToken = eatToken("Number");
-        return new AST.Number(new BigNumber(numberToken.value), numberToken.index);
+
+        if (numberToken.value.indexOf('.') == -1) {
+            numberToken.value += ".0";
+        }
+
+        return new AST.Number(new BigDecimal(numberToken.value), numberToken.index);
     }
 
     private UnaryExpression parseUnaryExpression() {
@@ -91,7 +96,7 @@ public class Parser {
             int rightPrecedence = precedenceOf(((BinaryExpression) right).operator);
             int leftPrecedence = precedenceOf(operator);
 
-            if (rightPrecedence < leftPrecedence) {
+            if (rightPrecedence <= leftPrecedence) {
                 left = new BinaryExpression(operator, left, ((BinaryExpression) right).left, left.index);
                 operator = ((BinaryExpression) right).operator;
                 right = ((BinaryExpression) right).right;

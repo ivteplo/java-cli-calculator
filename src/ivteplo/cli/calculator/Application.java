@@ -1,8 +1,7 @@
 // Copyright (c) 2022 Ivan Teplov
 package ivteplo.cli.calculator;
 
-import ivteplo.cli.calculator.utils.BigNumber;
-
+import java.math.BigDecimal;
 import java.util.Scanner;
 
 public class Application {
@@ -22,7 +21,7 @@ public class Application {
     }
 
     private static void evaluateInput() {
-        BigNumber result = calculator.evaluate(readLine());
+        BigDecimal result = calculator.evaluate(readLine());
         System.out.println(result.toString());
     }
 

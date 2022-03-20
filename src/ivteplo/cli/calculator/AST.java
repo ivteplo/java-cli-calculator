@@ -1,7 +1,9 @@
 // Copyright (c) 2022 Ivan Teplov
 package ivteplo.cli.calculator;
 
-import ivteplo.cli.calculator.utils.BigNumber;
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 
 public class AST {
     public static class Node {
@@ -11,20 +13,20 @@ public class AST {
             this.index = index;
         }
 
-        public BigNumber evaluate(String sourceInput) {
+        public BigDecimal evaluate(String sourceInput) {
             throw new Error("Don't know how to evaluate");
         }
     }
 
     public static class Number extends Node {
-        public BigNumber value;
+        public BigDecimal value;
 
-        public Number(BigNumber value, int index) {
+        public Number(BigDecimal value, int index) {
             super(index);
             this.value = value;
         }
 
-        public BigNumber evaluate(String sourceInput) {
+        public BigDecimal evaluate(String sourceInput) {
             return this.value;
         }
     }
@@ -44,12 +46,12 @@ public class AST {
             this.argument = argument;
         }
 
-        public BigNumber evaluate(String sourceInput) {
-            BigNumber argument = this.argument.evaluate(sourceInput);
+        public BigDecimal evaluate(String sourceInput) {
+            BigDecimal argument = this.argument.evaluate(sourceInput);
 
             return switch (operator) {
                 case PLUS -> argument;
-                case MINUS -> argument.multiply(new BigNumber(-1));
+                case MINUS -> argument.multiply(new BigDecimal(-1));
             };
         }
     }
@@ -62,7 +64,7 @@ public class AST {
             this.value = value;
         }
 
-        public BigNumber evaluate(String sourceInput) {
+        public BigDecimal evaluate(String sourceInput) {
             return value.evaluate(sourceInput);
         }
     }
@@ -95,25 +97,63 @@ public class AST {
             this.operator = operator;
         }
 
-        public BigNumber evaluate(String sourceInput) {
-            BigNumber left = this.left.evaluate(sourceInput);
-            BigNumber right = this.right.evaluate(sourceInput);
+        public BigDecimal evaluate(String sourceInput) {
+            BigDecimal left = this.left.evaluate(sourceInput);
+            BigDecimal right = this.right.evaluate(sourceInput);
 
             return switch (operator) {
                 case PLUS -> left.add(right);
-                case MINUS -> left.substract(right);
+                case MINUS -> left.subtract(right);
                 case TIMES -> left.multiply(right);
                 case DIVIDED_BY -> divide(left, right, sourceInput);
-                case EXPONENTIATION -> left.power(right);
+                case EXPONENTIATION -> pow(left, right, sourceInput);
             };
         }
 
-        private BigNumber divide(BigNumber left, BigNumber right, String sourceInput) {
-            if (right.toDouble() == 0.0d) {
+        private BigDecimal divide(BigDecimal left, BigDecimal right, String sourceInput) {
+            if (right.equals(new BigDecimal(0))) {
                 throw new CalculationError("Division by zero", sourceInput, this.left.index);
             }
 
-            return left.divide(right);
+            return left.divide(right, MathContext.DECIMAL128);
+        }
+
+        private BigDecimal pow(BigDecimal number, BigDecimal power, String sourceInput) {
+            BigDecimal minusOne = new BigDecimal(-1);
+            BigDecimal zero = new BigDecimal(0);
+            BigDecimal one = new BigDecimal(1);
+            BigDecimal two = new BigDecimal(2);
+
+            if (power.signum() == -1) {
+                BigDecimal positivePower = power.multiply(minusOne);
+                BigDecimal resultForPositivePower = pow(number, positivePower, sourceInput);
+                return divide(one, resultForPositivePower, sourceInput);
+            }
+
+            if (zero.equals(power.remainder(two))) {
+                BigDecimal numberSquared = number.multiply(number);
+                BigDecimal result = one;
+                BigDecimal iterationsLeft = power.divide(two, RoundingMode.DOWN);
+
+                while (!iterationsLeft.equals(zero)) {
+                    result = result.multiply(numberSquared);
+                    iterationsLeft = iterationsLeft.subtract(one);
+                }
+
+                return result;
+            }
+
+            if (one.equals(power.remainder(two))) {
+                return number.multiply(pow(number, power.subtract(one), sourceInput));
+            }
+
+            BigDecimal powerIntegerPart = power.setScale(0, RoundingMode.DOWN);
+            double powerFloatPart = power.subtract(powerIntegerPart).doubleValue();
+
+            BigDecimal powToInteger = pow(number, powerIntegerPart, sourceInput);
+            double powToDecimal = Math.pow(number.doubleValue(), powerFloatPart);
+
+            return powToInteger.multiply(new BigDecimal(powToDecimal));
         }
     }
 }

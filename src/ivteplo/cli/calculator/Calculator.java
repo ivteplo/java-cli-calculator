@@ -2,10 +2,11 @@
 package ivteplo.cli.calculator;
 
 import ivteplo.cli.calculator.AST.Node;
-import ivteplo.cli.calculator.utils.BigNumber;
+
+import java.math.BigDecimal;
 
 public class Calculator {
-    public BigNumber evaluate(String input) {
+    public BigDecimal evaluate(String input) {
         Node node = new Parser(input).parse();
         return node.evaluate(input);
     }

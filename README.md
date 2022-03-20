@@ -10,8 +10,8 @@ Calculator in your terminal, written in Java.
 - [x] Has support for parentheses
 - [x] Has exponentiation operator (`^`)
 - [x] Has support for floating-point numbers
+- [x] Uses `BigDecimal` in order to support big numbers
 
 ## Todo
 
 - [ ] Add some often-used mathematical functions
-- [ ] Maybe consider adding support for big numbers
