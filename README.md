@@ -15,3 +15,5 @@ Calculator in your terminal, written in Java.
 ## Todo
 
 - [ ] Add some often-used mathematical functions
+- [ ] Add a way to access the result of previous calculation (maybe by using a character like `&` or an identifier `result`)
+- [ ] Add support for navigation through previous input strings with arrow keys
